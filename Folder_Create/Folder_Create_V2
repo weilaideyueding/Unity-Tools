@@ -1,0 +1,69 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+using UnityEditor;
+
+public class Folder_Create_V1 : EditorWindow
+{
+    private string selectedFolderPath;
+    
+    [MenuItem("Tools/My Tools/Folder_Create")]
+    
+    public static void ShowWindow()
+    {
+        EditorWindow.GetWindow(typeof(Folder_Create_V1));
+    }
+
+    private void OnGUI()
+    {
+        if (GUILayout.Button("Select Folder"))
+        {
+            selectedFolderPath = EditorUtility.OpenFolderPanel("Select Folder", "", "");
+            if (!string.IsNullOrEmpty(selectedFolderPath))
+            {
+                Debug.Log("Selected Folder: " + selectedFolderPath);
+            }
+        }
+
+        if (GUILayout.Button("Create Folders"))
+        {
+            if (!string.IsNullOrEmpty(selectedFolderPath))
+            {
+                Folder_Create(selectedFolderPath);
+            }
+            else
+            {
+                Debug.Log("Please select a folder first.");
+            }
+        }
+    }
+    static void Folder_Create(string selectPath)
+    {
+        EditorWindow.GetWindow(typeof(Folder_Create_V1));
+
+        // string prjPath = Application.dataPath + "selectPath";
+        string prjPath = selectPath + "/";
+
+        Directory.CreateDirectory(prjPath + "Art");
+        Directory.CreateDirectory(prjPath + "Art/Animation");
+        Directory.CreateDirectory(prjPath + "Art/Audio");
+        Directory.CreateDirectory(prjPath + "Art/Material");
+        Directory.CreateDirectory(prjPath + "Art/Object");
+        Directory.CreateDirectory(prjPath + "Art/Texture");
+        
+        Directory.CreateDirectory(prjPath + "Code");
+        Directory.CreateDirectory(prjPath + "Code/Scripts");
+        Directory.CreateDirectory(prjPath + "Code/Shaders");
+        
+        Directory.CreateDirectory(prjPath + "Prefabs");
+        
+        Directory.CreateDirectory(prjPath + "Resources");
+        Directory.CreateDirectory(prjPath + "Resources/Characters");
+        Directory.CreateDirectory(prjPath + "Resources/Managers");
+        Directory.CreateDirectory(prjPath + "Resources/Props");
+        Directory.CreateDirectory(prjPath + "Resources/UI");
+        
+        AssetDatabase.Refresh();
+    }
+}
