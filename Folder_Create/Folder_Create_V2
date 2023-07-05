@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 
-public class Folder_Create_V1 : EditorWindow
+public class Folder_Create_V2 : EditorWindow
 {
     private string selectedFolderPath;
     
