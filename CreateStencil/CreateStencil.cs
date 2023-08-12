@@ -12,8 +12,9 @@ public class CreateStencil : Editor
     [MenuItem("Assets/Create/My Stencil/PostprocessFeature", priority = 11)]
     static void CreatePostprocessFeature()
     {
-        ProjectWindowUtil.CreateScriptAssetFromTemplateFile(baseShaderPath,"PostprocessFeature.cs");
+        ProjectWindowUtil.CreateScriptAssetFromTemplateFile(postprocessFeaturePath,"PostprocessFeature.cs");
     }
 }
+
 
 
