@@ -8,7 +8,6 @@ public class Postprocess_Feature : ScriptableRendererFeature
     {
         private Shader shader;
         private Material material;
-        private int dest;
         
         //构造函数
         public CustomRenderPass()
@@ -27,7 +26,7 @@ public class Postprocess_Feature : ScriptableRendererFeature
                 return;
             }
             
-            dest = shader.FindPropertyIndex("");
+            
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -40,7 +39,8 @@ public class Postprocess_Feature : ScriptableRendererFeature
             
             var sour = renderingData.cameraData.renderer.cameraColorTargetHandle;
             var descriptor = renderingData.cameraData.cameraTargetDescriptor;
-
+            int dest = shader.FindPropertyIndex("");
+            
             CommandBuffer cmd = CommandBufferPool.Get("");
             
             cmd.GetTemporaryRT(dest, descriptor);
