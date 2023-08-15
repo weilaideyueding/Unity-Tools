@@ -12,7 +12,7 @@ public class Postprocess_Feature : ScriptableRendererFeature
         //构造函数
         public CustomRenderPass()
         {
-            shader = Shader.Find("");
+            shader = Shader.Find("");   // 需自己填写
             if (shader == null)
             {
                 Debug.LogWarningFormat("没有找到后处理Shader");
@@ -33,19 +33,22 @@ public class Postprocess_Feature : ScriptableRendererFeature
         {
             if (renderingData.postProcessingEnabled == false)
             {
-                Debug.LogWarningFormat("相机没开后处理还想要后处理雾？");
                 return;
             }
+
+            // var vaolume = VolumeManager.instance.stack.GetComponent<>();
             
             var sour = renderingData.cameraData.renderer.cameraColorTargetHandle;
             var descriptor = renderingData.cameraData.cameraTargetDescriptor;
-            int dest = shader.FindPropertyIndex("");
+            int dest = Shader.PropertyToID(""); // 需自己填写
             
-            CommandBuffer cmd = CommandBufferPool.Get("");
+            CommandBuffer cmd = CommandBufferPool.Get(""); // 需自己填写
             
             cmd.GetTemporaryRT(dest, descriptor);
             
-            cmd.Blit(sour, dest, material);
+            cmd.Blit(sour, dest);
+            
+            cmd.Blit(dest, sour, material);
             
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
