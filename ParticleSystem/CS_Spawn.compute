@@ -1,0 +1,63 @@
+#pragma kernel CSMain
+
+struct Particle
+{
+     float3 position; // 粒子位置
+     float3 velocity; // 粒子速度
+     float life;       // 粒子生命周期
+};
+
+struct SystemArgs {
+     uint particleCount; //存活粒子数量
+     uint maxParticleCount; //容器最大粒子数量
+};
+
+//生成0~1的随机数
+float hash21(float2 p)
+{
+     float3 p3 = frac(float3(p.xyx) * .1031);
+     p3 += dot(p3, p3.yzx + 33.33);
+     return frac((p3.x + p3.y) * p3.z);
+}
+
+uint _spawnCount; // 每帧生成粒子数量
+float _timeLoaded;
+
+AppendStructuredBuffer<Particle> _Particles; // 粒子容器
+StructuredBuffer<SystemArgs> _SystemArgs; // 系统参数
+
+[numthreads(64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+     if (id.x >= _spawnCount)
+     {
+          return;
+     }
+     
+     // 获取到C#中的数据，因为是数组，所以需要通过序号获取
+     SystemArgs args = _SystemArgs[0];
+     uint particleCount = args.particleCount;
+     uint maxParticleCount = args.maxParticleCount;
+     
+     // 限定粒子的最大数量，因为是并行而不是循环，所以需要加上ID，来确保数量上限
+     if (particleCount + id.x >= maxParticleCount)
+     {
+          return;
+     }
+     
+     float x = hash21(float2(id.x, _timeLoaded * 1234.2342));
+     float z = hash21(float2(x * _timeLoaded * 12.221, x * id.x));
+     
+     // 随机粒子位置
+     float3 position = float3(x, 0, z) * 10 - 5; // [0, 1]映射到[-5, 5]
+     position.y = 5;
+     
+     Particle particle;
+     particle.position = position;
+     particle.life = 2.5;
+     particle.velocity = float3(0, 0, 0);
+     
+     // 添加粒子
+     _Particles.Append(particle);
+     
+}

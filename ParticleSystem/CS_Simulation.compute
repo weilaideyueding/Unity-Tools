@@ -1,0 +1,53 @@
+#pragma kernel CSMain
+
+struct Particle
+{
+    float3 position; // 粒子位置
+    float3 velocity; // 粒子速度
+    float life;       // 粒子生命周期
+};
+
+struct SystemArgs {
+    uint particleCount; //存活粒子数量
+    uint maxParticleCount; //容器最大粒子数量
+};
+
+float _deltaTime;
+float3 _gravity;
+
+ConsumeStructuredBuffer<Particle> _Particles; // 输入，目前存活粒子
+AppendStructuredBuffer<Particle> _AliveParticles; // 输出，模拟后剩下的存活粒子
+
+StructuredBuffer<SystemArgs> _SystemArgs;
+
+[numthreads(64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    SystemArgs args = _SystemArgs[0];
+    uint particleCount = args.particleCount;
+    
+    if (id.x > particleCount)
+    {
+        return;
+    }
+    
+    // 获取粒子参数
+    Particle p = _Particles.Consume(); // 会从末尾拿到粒子参数，这个如何保证每个线程拿到的是哪个
+    float currentLifeTime = p.life - _deltaTime;
+    
+    // 只写入存活的粒子
+    if (currentLifeTime > 0.0f)
+    {
+        float3 acceleration  = _gravity;
+        float3 velocity = p.velocity + acceleration * _deltaTime;
+        float3 position = p.position + velocity * _deltaTime;
+        
+        p.position = position;
+        p.velocity = velocity;
+        p.life = currentLifeTime;
+
+        _AliveParticles.Append(p);
+    }
+    
+    
+}
